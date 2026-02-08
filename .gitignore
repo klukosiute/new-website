@@ -1,0 +1,17 @@
+# Claude Code configuration and memory
+.claude/
+
+# Node modules (if needed for future development)
+node_modules/
+package-lock.json
+
+# Development artifacts
+*.py
+*.js
+TASK.md
+url-mapping.md
+port-posts/
+screenshots_comparison/
+
+# System files
+.DS_Store
