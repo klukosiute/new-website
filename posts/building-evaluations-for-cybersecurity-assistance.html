@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(Work in Progress) Building evaluations for cybersecurity assistance - Kamilė Lukošiūtė</title>
+    <meta name="description" content="On cybersecurity evaluations">
+
+    <!-- Open Graph / Social Cards -->
+    <meta property="og:title" content="(Work in Progress) Building evaluations for cybersecurity assistance">
+    <meta property="og:description" content="On cybersecurity evaluations">
+    <meta property="og:image" content="/images/cybsersec_card.png">
+    <meta property="og:type" content="article">
+
+    <!-- KaTeX for LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #222;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2em;
+            padding-bottom: 1em;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header a {
+            color: #222;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 0.67em 0 0.3em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin: 0.83em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin: 1em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        p {
+            margin-bottom: 0.75em;
+        }
+
+        a {
+            color: #0000EE;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #551A8B;
+        }
+
+        a:hover {
+            color: #0000EE;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            background: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 1em 0;
+            border-radius: 5px;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.5em auto;
+        }
+
+        blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        ul, ol {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.4;
+            color: #555;
+            margin-bottom: 0.2em;
+        }
+
+        .date {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-bottom: 1em;
+        }
+
+        footer {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* LaTeX math blocks */
+        .katex-display {
+            margin: 1.5em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        /* Footnotes styling */
+        .footnote {
+            font-size: 0.9em;
+        }
+
+        .footnotes {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        sup {
+            line-height: 0;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/">← kamilelukosiute.com</a>
+        </header>
+
+        <article>
+            <h1>(Work in Progress) Building evaluations for cybersecurity assistance</h1>
+
+            <p class="date">Oct 27, 2024</p>
+            <p>Lately, I've been thinking about how language model evaluations should be built in order to reliably answer the questions a researcher is asking<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.  I've come to ~zero conclusions on that so far, but as part of that thinking process, my colleague (an actual security expert) <a href="https://deadbits.ai/">Adam Swanda</a><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> and I wrote a nifty little cybersecurity assistance usefulness evaluation. </p>
+<p>We recently presented this eval at <a href="https://www.camlis.org/">CAMLIS</a> and made it <a href="https://github.com/kamilelukosiute/yet-another-cybersec-assistance-eval">public</a>, and so although I'm nowhere close to understanding how to build better evaluations, I thought I should briefly write about the thought process so far. It's all a work in progress: the eval is tiny, the thinking is fuzzy. Nevertheless, if I don't write about it now, I might never do it at all. </p>
+<p>What I'm calling "Yet Another Cybersecurity Assistance Evaluation" was inspired by how unsatisfying public language model evaluations for cybersecurity tasks feel to me. They just don't seem to be capable of answering the questions that I have. There are two reasons I can think of why this might be the case.</p>
+<p>First, perhaps existing evaluations aren't simulating the threat model they are concerned with sufficiently accurately that I would trust conclusions drawn from the result. There are examples already where one set of researchers draws some conclusions about the <em>in</em>ability of a model to do something and then another set of researchers scaffolds the model that <a href="https://googleprojectzero.blogspot.com/2024/06/project-naptime.html">fully saturates the benchmark</a>. It seems unwise to trust the drawn conclusions if you don't trust the simulation. </p>
+<p>Second, perhaps I'm dissatisfied with the evaluations out there because I am not convinced that the threat models we are testing are the ones we should care about. For example, in 2022, you might've been extremely concerned about model-generated phishing text enabling actors to run way more attacks. Yet in 2024, nearly 2 years after the release of GPT-4... it just doesn't seem like the volume of phishing has gone up drastically? The <a href="https://www.ic3.gov/AnnualReport/Reports/2023_IC3Report.pdf">few reliable sources I can find</a><sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> of statistics on this find no increase in that time period. If automating phishing is such a big threat, then why is no one doing it? It's probably because it's not as big of a threat as we think. Adam tells me that, although writing phishing emails is <em>easy</em> for LLMs, it's just not the bottleneck for attackers. Instead, we should be concerned when LLMs start automating tasks that <em>are</em> bottlenecks for attackers. This requires modeling the adversary accurately, which is, of course, hard.</p>
+<p>In building our cybersecurity assistance eval, Adam and I tried to address the first problem for one specific threat model: adversaries using LLMs as copilots throughout their attack development process. We aimed to build an a realistic cybersecurity assistance evaluation, based on our own experiences of talking to LLMs all day. We wrote prompts that are similarly phrased to how we seek assistance from LLMs on coding and research tasks. We're just two people, so of course it's likely not representative <em>in full</em>, but I like to think we did a decent job. Our prompts seem to be similar to the behaviours that OpenAI <a href="https://cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_October-2024.pdf">report</a> of threat actors (like asking for help debugging a script, or how to access user passwords in MacOS). </p>
+<p>So, that eval is now out there, and I still hope to figure out how to build better evals. The questions from this work in particular that remain are:
+1. What are the threat models re: cybersecurity that actually matter right now, that incorporate both knowledge of model abilities <em>and</em> likelihood to empower adversaries?
+2. To get a real understanding of the threat of LLMs in cybersecurity, do we need to have evals for every threat model or is there a way to model such abilities from a small set of evals?</p>
+<p>That last question is really what I think about in the shower and on the train. <a href="https://arxiv.org/abs/2405.10938">This paper</a> is the most exciting thing I've read all year. I really hope that method or some derivative of it works. If anyone wants to collaborate on answering these questions, please do reach out :) </p>
+<h3>Some results on the eval</h3>
+<p>Some results on Claude 3.5 Sonnet (Oct 2024), GPT-4o, and Gemini Pro below. This is a strange eval because it's not clear to me if "smaller is better" or "bigger is better." Interpret with many many grains of salt!!! </p>
+<p>Credit to <a href="https://nicholas.carlini.com/writing/2024/my-benchmark-for-large-language-models.html">Nicholas Carlini</a> for the results visualisation (and also the evaluation framework).</p>
+<iframe src="https://kamilelukosiute.github.io/yet-another-cybersec-assistance-eval/" width="100%" height=400></iframe>
+
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>As opposed to: giving a proxy answer to a proxy question without much clarity on how applicable the result is.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>We did this work while we were still at Robust Intelligence, which was recently acquired by Cisco.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>See page 8.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        </article>
+
+        <footer>
+            <p><a href="/posts/">← All posts</a></p>
+        </footer>
+    </div>
+
+    <!-- Initialize KaTeX auto-render -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>

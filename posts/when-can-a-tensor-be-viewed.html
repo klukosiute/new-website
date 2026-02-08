@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>When can a tensor be view()ed? - Kamilė Lukošiūtė</title>
+    <meta name="description" content="Blog post: When can a tensor be view()ed?">
+
+    <!-- Open Graph / Social Cards -->
+    <meta property="og:title" content="When can a tensor be view()ed?">
+    <meta property="og:description" content="Blog post: When can a tensor be view()ed?">
+    
+    <meta property="og:type" content="article">
+
+    <!-- KaTeX for LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #222;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2em;
+            padding-bottom: 1em;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header a {
+            color: #222;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 0.67em 0 0.3em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin: 0.83em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin: 1em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        p {
+            margin-bottom: 0.75em;
+        }
+
+        a {
+            color: #0000EE;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #551A8B;
+        }
+
+        a:hover {
+            color: #0000EE;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            background: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 1em 0;
+            border-radius: 5px;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.5em auto;
+        }
+
+        blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        ul, ol {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.4;
+            color: #555;
+            margin-bottom: 0.2em;
+        }
+
+        .date {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-bottom: 1em;
+        }
+
+        footer {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* LaTeX math blocks */
+        .katex-display {
+            margin: 1.5em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        /* Footnotes styling */
+        .footnote {
+            font-size: 0.9em;
+        }
+
+        .footnotes {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        sup {
+            line-height: 0;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/">← kamilelukosiute.com</a>
+        </header>
+
+        <article>
+            <h1>When can a tensor be view()ed?</h1>
+            
+            <p class="date">Mar 16, 2022</p>
+            <p>A common operation in PyTorch is taking a tensor with the same data and giving it a new shape. The usual method to do this is to call <code>torch.Tensor.view(new_shape)</code>. This operation is nice because the returned tensor shares the underlying data with the original tensor, which avoids data copy and makes the reshaping memory-efficient. This of course introduces the usual quirk that if you change a value in the original tensor, the corresponding value will change in the <code>.view()</code>ed tensor. </p>
+<p><code>.view()</code> cannot always be used. At minimum, <code>new_shape</code> must have the same total number of elements as the original tensor. There are also additional requirements for the compatibility of the old and new shapes. However, the documentation about this is kinda opaque, so the purpose of this blog post is to try to understand those requirements in more detail. </p>
+<p>(If you know PyTorch better than I do, and I got something wrong here, please contact me!)</p>
+<p>Let's begin with what <a href="https://pytorch.org/docs/stable/generated/torch.Tensor.view.html#torch.Tensor.view">the torch documentation</a> says:</p>
+<blockquote>
+<p>For a tensor to be viewed, the new view size must be compatible with its original size and stride, i.e., each new view dimension must either be a subspace of an original dimension, or only span across original dimensions $d, d+1, \dots, d+k$ that satisfy the following contiguity-like condition that $\forall i = d, \dots, d+k-1$,
+$$\text{stride}[i] = \text{stride}[i+1] \times \text{size}[i+1] $$</p>
+</blockquote>
+<p>There are two conditions given here; notice that the tensor need only satisfy <em>one</em> of them. The first is the "subspace" condition and the second is the "contiguity-like" condition. Let's start with the second condition, since when you create tensors in PyTorch, they are by default contiguous.</p>
+<h3>Contiguity-like condition</h3>
+<p>Let's create a tensor to work with as an example:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>z <span style="color: #666666">=</span> torch<span style="color: #666666">.</span>arange(<span style="color: #666666">12</span>)<span style="color: #666666">.</span>reshape(<span style="color: #666666">3</span>,<span style="color: #666666">4</span>)
+<span style="color: #008000">print</span>(z)
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">1</span>, <span style="color: #666666">2</span>, <span style="color: #666666">3</span>],  
+        [ <span style="color: #666666">4</span>, <span style="color: #666666">5</span>, <span style="color: #666666">6</span>, <span style="color: #666666">7</span>], 
+        [ <span style="color: #666666">8</span>, <span style="color: #666666">9</span>, <span style="color: #666666">10</span>, <span style="color: #666666">11</span>]])
+</code></pre></div>
+
+<p>PyTorch tensors are stored by default in C row order so that our tensor <code>z</code> 
+<img src="/images/matrix.png" style="max-width: 200px" alt="matrix.png">
+is stored in memory like so:
+<img src="/images/matrix_memory.png" alt="matrix_memory.png">
+The "contiguity-like" condition involves thinking about how you would access adjacent elements in memory in order to provide the elements of the new array. </p>
+<p>Our example is a two dimensional tensor, meaning that the original dimensions are 0 and 1. We can see the size of these dimensions by just calling  <code>size()</code>:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z<span style="color: #666666">.</span>size())
+
+torch<span style="color: #666666">.</span>Size([<span style="color: #666666">3</span>, <span style="color: #666666">4</span>])
+</code></pre></div>
+
+<p>Alright, so what's stride? <code>torch.Tensor.stride(dim)</code> is the "jump necessary to go from one element to the next one in the specified dimension <code>dim</code>" in computer memory. We can look at this value by calling <code>stride()</code>:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z<span style="color: #666666">.</span>stride())
+
+(<span style="color: #666666">4</span>,<span style="color: #666666">1</span>)
+</code></pre></div>
+
+<p>What this is telling us is that, to access adjacent values in the 0th dimension (i.e. to access values that make up a column), we need to jump by 4 values in memory. To access adjacent values in the 1st dimension (i.e. to access values that make up a row), we only need to jump by 1 value. </p>
+<p>When you call <code>view()</code> on an array, the original memory storage is not changed, but the <code>stride()</code> <em>is</em> changed, and therefore has to be compatible with the original stride. This is what the "contiguity-like" condition is telling us.</p>
+<p>Let's say I want to reshape <code>z</code> into shape (6,2). To see if this is possible, I can check the condition specified in the documentation. First, we need to determine which dimensions our new dimensions will span across. The statement $\forall i = d, \dots, d+k-1$ is looking for all dimensions from dimension $d$ to $d+k-1$ where $k$ is the count of dimensions that the new dimensions span across <em>minus one</em> (I don't know why it's like this, but it can't be anything else or it doesn't work out). So you need to check all the old dimensions that the new dimensions span across except the last one. Then, the condition to check is that $\forall i = d, \dots, d+k-1$,
+$$
+\text{stride}[i] = \text{stride}[i+1] \times \text{size}[i+1]
+$$
+Before actually doing the computation, let's think briefly about what this condition is saying. First, notice that the condition is on the <em>original</em> dimensions that the new dimensions span across. PyTorch expects the original tensor to be row-contiguous in order to reshape it, and that's basically what the condition is checking: if I take a step in dimension $i$, which requires me to take the number of steps returned by $\text{stride}[i]$, do I step over an entire row of a later dimension $i+1$, which would require taking $\text{stride}[i+1] \times \text{size}[i+1]$ steps? This is equivalent to asking if dimension $i$ is row-contiguous.</p>
+<p>Coming back to our example now, our new dimensions will span across <em>both</em> of the old ones, so $d=0, k=2-1=1$ so we need to check just the original 0th dimension: $\text{stride}[0] = \text{stride}[1] \times \text{size}[1]$ $4 = 1 \times 4$. Great, since our original <code>z</code> is contiguous, we can use <code>view()</code> to turn it into any shape that has the same number of elements i.e. 12:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z<span style="color: #666666">.</span>view(<span style="color: #666666">6</span>,<span style="color: #666666">2</span>))
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">1</span>],  
+        [ <span style="color: #666666">2</span>, <span style="color: #666666">3</span>],  
+        [ <span style="color: #666666">4</span>, <span style="color: #666666">5</span>],  
+        [ <span style="color: #666666">6</span>, <span style="color: #666666">7</span>],  
+        [ <span style="color: #666666">8</span>, <span style="color: #666666">9</span>],  
+        [<span style="color: #666666">10</span>, <span style="color: #666666">11</span>]])
+</code></pre></div>
+
+<p>I can also take a look at the new stride and see that, to jump along the 0th dimension, we need to now jump by 2 values</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z<span style="color: #666666">.</span>view(<span style="color: #666666">6</span>,<span style="color: #666666">2</span>)<span style="color: #666666">.</span>stride())
+
+(<span style="color: #666666">2</span>, <span style="color: #666666">1</span>)
+</code></pre></div>
+
+<p>but the new viewed tensor is still contiguous. </p>
+<p>So when would the "contiguity-like" condition NOT hold? We can make a very similar tensor</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>z_t <span style="color: #666666">=</span> torch<span style="color: #666666">.</span>arange(<span style="color: #666666">12</span>)<span style="color: #666666">.</span>reshape(<span style="color: #666666">3</span>,<span style="color: #666666">4</span>)<span style="color: #666666">.</span>t()
+<span style="color: #008000">print</span>(z_t)
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">4</span>, <span style="color: #666666">8</span>],  
+        [ <span style="color: #666666">1</span>, <span style="color: #666666">5</span>, <span style="color: #666666">9</span>],  
+        [ <span style="color: #666666">2</span>, <span style="color: #666666">6</span>, <span style="color: #666666">10</span>],  
+        [ <span style="color: #666666">3</span>, <span style="color: #666666">7</span>, <span style="color: #666666">11</span>]])
+</code></pre></div>
+
+<p>but this tensor is no longer row-contiguous. In <code>torch</code>, a transposed tensor shares the same underlying data as the original, but that means that contiguity is lost because adjacent values are no longer contiguous in memory. It's now the <em>columns</em> that are contiguous in memory i.e.
+<img src="/images/matrix_transpose.png" style="max-width: 150px" alt="matrix_transpose.png">
+But in memory, it still looks like so:
+<img src="/images/matrix_memory.png" alt="matrix_memory.png"></p>
+<p>We can also see this by looking at the stride of <code>z_t</code>:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z_t<span style="color: #666666">.</span>stride())
+
+(<span style="color: #666666">1</span>,<span style="color: #666666">4</span>)
+</code></pre></div>
+
+<p>Could we use <code>view()</code> to reshape <code>z_t</code> into shape 6,2? We check the contiguity-like condition:
+$$
+\text{stride}[0] = \text{stride}[1] \times \text{size}[1]
+$$
+$$
+1 \not= 4 \times 3
+$$
+and we see that it does not hold. </p>
+<h3>Subspace condition</h3>
+<p>There <em>are</em> other shapes we could give <code>z_t</code> with <code>.view()</code>, however. Imagine we would like to reshape it into shape 2,2,3. The contiguity-like condition does not hold because the original tensor is not contiguous, but now we can check the second condition ("each new view dimension must either be a subspace of an original dimension").</p>
+<p>We can think of reshaping <code>(4,3) -&gt; (2,2,3)</code> as splitting dimension 0 into two "subspaces." I actually can't quite figure out if this "subspace" has anything to do with a proper linear algebra subspace, but that's not the most important thing. I can definitely tell you that, even when a tensor is not contiguous, you can reshape it if you are only affecting one dimension at a time. For example, here, we are splitting the 0th dimension into two dimensions of size 2 each:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z_t<span style="color: #666666">.</span>view(<span style="color: #666666">2</span>,<span style="color: #666666">2</span>,<span style="color: #666666">3</span>))
+
+tensor([[[ <span style="color: #666666">0</span>, <span style="color: #666666">4</span>, <span style="color: #666666">8</span>],  
+         [ <span style="color: #666666">1</span>, <span style="color: #666666">5</span>, <span style="color: #666666">9</span>]],  
+
+        [[ <span style="color: #666666">2</span>, <span style="color: #666666">6</span>, <span style="color: #666666">10</span>],  
+         [ <span style="color: #666666">3</span>, <span style="color: #666666">7</span>, <span style="color: #666666">11</span>]]])
+</code></pre></div>
+
+<p>We can also look at the stride of <em>this</em> tensor</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000">print</span>(z_t<span style="color: #666666">.</span>view(<span style="color: #666666">2</span>,<span style="color: #666666">2</span>,<span style="color: #666666">3</span>)<span style="color: #666666">.</span>stride())
+
+(<span style="color: #666666">2</span>,<span style="color: #666666">1</span>,<span style="color: #666666">4</span>)
+</code></pre></div>
+
+<p>and see that the first two dimensions are contiguous while the last one is not. (As far as I can tell, your tensor is contiguous if the values of the stride are in descending order.)</p>
+<p>So these are the two conditions when you can <code>view()</code> a tensor: when you can reshape it simply by reassigning new values of the stride, or when you can split each dimension individually, and our question is answered. Below, I have some additional notes that may be of use. </p>
+<h3>Addendum</h3>
+<p>When you can't use <code>.view()</code> to reshape your tensor, you can call <code>.contiguous()</code>, which makes a copy of the tensor in a new chunk of memory such that it is stored in a contiguous manner, and try again:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>z_t <span style="color: #666666">=</span> torch<span style="color: #666666">.</span>arange(<span style="color: #666666">12</span>)<span style="color: #666666">.</span>reshape(<span style="color: #666666">3</span>,<span style="color: #666666">4</span>)<span style="color: #666666">.</span>t()
+<span style="color: #008000">print</span>(z_t<span style="color: #666666">.</span>contiguous()<span style="color: #666666">.</span>view(<span style="color: #666666">2</span>,<span style="color: #666666">6</span>))
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">4</span>, <span style="color: #666666">8</span>, <span style="color: #666666">1</span>, <span style="color: #666666">5</span>, <span style="color: #666666">9</span>],  
+        [ <span style="color: #666666">2</span>, <span style="color: #666666">6</span>, <span style="color: #666666">10</span>, <span style="color: #666666">3</span>, <span style="color: #666666">7</span>, <span style="color: #666666">11</span>]])<span style="border: 1px solid #FF0000">```</span>
+
+Alternatively, you can just use the method <span style="border: 1px solid #FF0000">`</span>reshape()<span style="border: 1px solid #FF0000">`</span>, which <span style="border: 1px solid #FF0000">`</span>view()<span style="border: 1px solid #FF0000">`</span>s when it can, <span style="color: #AA22FF; font-weight: bold">and</span> otherwise calls <span style="border: 1px solid #FF0000">`</span>contiguous()<span style="border: 1px solid #FF0000">`</span> <span style="color: #AA22FF; font-weight: bold">and</span> then <span style="border: 1px solid #FF0000">`</span>view()<span style="border: 1px solid #FF0000">`</span>:
+<span style="border: 1px solid #FF0000">```</span>python
+<span style="color: #008000">print</span>(z_t<span style="color: #666666">.</span>reshape(<span style="color: #666666">2</span>,<span style="color: #666666">6</span>))
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">4</span>, <span style="color: #666666">8</span>, <span style="color: #666666">1</span>, <span style="color: #666666">5</span>, <span style="color: #666666">9</span>],  
+        [ <span style="color: #666666">2</span>, <span style="color: #666666">6</span>, <span style="color: #666666">10</span>, <span style="color: #666666">3</span>, <span style="color: #666666">7</span>, <span style="color: #666666">11</span>]])
+</code></pre></div>
+
+<p>Lastly, if <code>z.shape = (3,4)</code>,  <code>z.t() != z.view(4,3)</code> because <code>.view()</code> does a <em>shift</em> along the contiguous dimensions, and transposing is... not that. For some reason I made the mistake of assuming that there's only ONE way of reshaping an array of size <code>(x,y)</code> into an array of size <code>(y,x)</code>, perhaps because in ML theory transposes show up so often, but that's just not the case, so don't be a goof like me:</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>z <span style="color: #666666">=</span> torch<span style="color: #666666">.</span>arange(<span style="color: #666666">12</span>)<span style="color: #666666">.</span>reshape(<span style="color: #666666">3</span>,<span style="color: #666666">4</span>)
+<span style="color: #008000">print</span>(z)
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">1</span>, <span style="color: #666666">2</span>, <span style="color: #666666">3</span>],  
+        [ <span style="color: #666666">4</span>, <span style="color: #666666">5</span>, <span style="color: #666666">6</span>, <span style="color: #666666">7</span>],  
+        [ <span style="color: #666666">8</span>, <span style="color: #666666">9</span>, <span style="color: #666666">10</span>, <span style="color: #666666">11</span>]])
+
+<span style="color: #008000">print</span>(z<span style="color: #666666">.</span>t())
+
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">4</span>, <span style="color: #666666">8</span>],  
+        [ <span style="color: #666666">1</span>, <span style="color: #666666">5</span>, <span style="color: #666666">9</span>],  
+        [ <span style="color: #666666">2</span>, <span style="color: #666666">6</span>, <span style="color: #666666">10</span>],  
+        [ <span style="color: #666666">3</span>, <span style="color: #666666">7</span>, <span style="color: #666666">11</span>]])
+
+<span style="color: #008000">print</span>(z<span style="color: #666666">.</span>view(<span style="color: #666666">4</span>,<span style="color: #666666">3</span>))
+tensor([[ <span style="color: #666666">0</span>, <span style="color: #666666">1</span>, <span style="color: #666666">2</span>],  
+        [ <span style="color: #666666">3</span>, <span style="color: #666666">4</span>, <span style="color: #666666">5</span>],  
+        [ <span style="color: #666666">6</span>, <span style="color: #666666">7</span>, <span style="color: #666666">8</span>],  
+        [ <span style="color: #666666">9</span>, <span style="color: #666666">10</span>, <span style="color: #666666">11</span>]])
+</code></pre></div>
+        </article>
+
+        <footer>
+            <p><a href="/posts/">← All posts</a></p>
+        </footer>
+    </div>
+
+    <!-- Initialize KaTeX auto-render -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>

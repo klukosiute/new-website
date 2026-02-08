@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamilė Lukošiūtė</title>
+    <meta name="description" content="Personal website of Kamilė Lukošiūtė">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #222;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 1em 0 0.5em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin: 1.5em 0 0.5em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: 1.17em;
+            margin: 1.5em 0 0.5em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        p {
+            margin-bottom: 0.75em;
+        }
+
+        ul {
+            list-style: disc;
+            margin: 0 0 1em 0;
+            padding-left: 2em;
+        }
+
+        li {
+            margin-bottom: 0.1em;
+        }
+
+        a {
+            color: #0000EE;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #551A8B;
+        }
+
+        a:hover {
+            color: #0000EE;
+        }
+
+        sup {
+            line-height: 0;
+        }
+
+        .footnotes {
+            margin-top: 2em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>kamilė lukošiūtė</h2>
+
+        <p>I work on the threat modeling<sup id="fnref:1"><a href="#fn:1">1</a></sup> team at <a href="https://www.governance.ai/">GovAI</a>, where I focus on cyber misuse risks from AI. My research examines extreme misuse scenarios to understand maximum potential harms and inform risk mitigation strategies. This work feeds into designing evaluations, setting capability thresholds for frontier safety policies, and prioritizing interventions. I focus on verifying that proposed safeguards are effective against realistic adversaries and that defensive tools are operationally viable for the defenders who need to use them.</p>
+
+        <p>Contact me at kamile [dot] lukosiute [at] governance [dot] ai.</p>
+
+        <h3>writing</h3>
+        <ul>
+            <li>(Dec 8, 2025) <a href="/posts/design-for-the-defenders-you-care-about-or-risk-being-useless.html">Design for the defenders you care about or risk being useless</a>: On operational constraints of critical infrastructure providers and the limits of AI-powered vulnerability discovery</li>
+            <li>(Oct 27, 2024) <a href="/posts/building-evaluations-for-cybersecurity-assistance.html">Building evaluations for cybersecurity assistance</a>: A short work-in-progress post.</li>
+            <li>(Apr 23, 2024) <a href="/posts/you-need-to-be-spending-more-money-on-evals.html">You need to be spending more money on evals</a>: On over-generalisation in LLM evaluations</li>
+            <li>(Feb 27, 2024) <a href="/posts/maybe-dont-give-language-models-standardized-tests.html">Maybe don't give language models standardized tests</a>: On misleading LLM evaluations</li>
+            <li>(Sep 1, 2023) <a href="/posts/american-character.html">American Character</a>: On the best things about America</li>
+            <li>(Apr 14, 2022) <a href="/posts/what-does-bcewithlogits-actually-do.html">What does BCEWithLogits actually do?</a>: On technical details</li>
+            <li>(Mar 16, 2022) <a href="/posts/when-can-a-tensor-be-viewed.html">When can a tensor be view()ed?</a>: On more technical details</li>
+            <li>(Dec 11, 2021) <a href="/posts/neutron-star-mergers-and-fast-surrogate-modeling.html">Neutron star mergers and fast surrogate modeling</a>: On my astrophysics research</li>
+        </ul>
+
+        <h3>other past work</h3>
+        <ul>
+            <li>I was an AI Security Researcher at Cisco Security, where I worked on uses of LLMs in things like malware attribution.</li>
+            <li>I was a resident researcher at Anthropic, where I worked on scalable oversight and evaluations. One of my publicly available projects was on model-written evals.</li>
+            <li>I was a PhD in machine learning for theoretical physics but dropped out to help to make AI's safe.</li>
+            <li>During my bachelor's and master's in physics, I published a paper on training cVAE surrogate models for kilonova parameter inference.</li>
+        </ul>
+
+        <h3>contact!</h3>
+        <p>CV/Resume<br>
+        <a href="https://x.com/kamilelukosiute">x dot com</a></p>
+
+        <div class="footnotes">
+            <ol>
+                <li id="fn:1">
+                    <p>Unfortunately, "threat modeling" here has nothing to do with cybersecurity threat modeling. What we mean by threat modeling is closer to the risk modeling definition in the <a href="https://code-of-practice.ai/?section=safety-security#measure-3-3-systemic-risk-modelling">EU AI Act Code of Practice</a>. <a href="#fnref:1">&#8617;</a></p>
+                </li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

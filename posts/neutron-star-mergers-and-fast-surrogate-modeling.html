@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neutron star mergers and fast surrogate modeling - Kamilė Lukošiūtė</title>
+    <meta name="description" content="Blog post: Neutron star mergers and fast surrogate modeling">
+
+    <!-- Open Graph / Social Cards -->
+    <meta property="og:title" content="Neutron star mergers and fast surrogate modeling">
+    <meta property="og:description" content="Blog post: Neutron star mergers and fast surrogate modeling">
+    
+    <meta property="og:type" content="article">
+
+    <!-- KaTeX for LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #222;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2em;
+            padding-bottom: 1em;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header a {
+            color: #222;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 0.67em 0 0.3em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin: 0.83em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin: 1em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        p {
+            margin-bottom: 0.75em;
+        }
+
+        a {
+            color: #0000EE;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #551A8B;
+        }
+
+        a:hover {
+            color: #0000EE;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            background: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 1em 0;
+            border-radius: 5px;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.5em auto;
+        }
+
+        blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        ul, ol {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.4;
+            color: #555;
+            margin-bottom: 0.2em;
+        }
+
+        .date {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-bottom: 1em;
+        }
+
+        footer {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* LaTeX math blocks */
+        .katex-display {
+            margin: 1.5em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        /* Footnotes styling */
+        .footnote {
+            font-size: 0.9em;
+        }
+
+        .footnotes {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        sup {
+            line-height: 0;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/">← kamilelukosiute.com</a>
+        </header>
+
+        <article>
+            <h1>Neutron star mergers and fast surrogate modeling</h1>
+            
+            <p class="date">Dec 11, 2021</p>
+            <p>As I was transitioning out of my Bachelor's and into my Master's, I picked up a project on the side. It boils down to "I trained a neural network to do predict some things that are useful for astrophysicists," or more precisely "I trained conditional variational autoencoders to serve as surrogate models for the spectra of kilonovae." </p>
+<p>As far as machine learning goes, it's not new, really. Even as far as astrophysics goes, it just applies a method that's not used in this field. The thing is, though, it’s <em>useful</em>. It speeds up a really common analysis method something like 400 times<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> This is important, first, for the discovery of kilonovae for which it <a href="https://arxiv.org/abs/2001.06551">latency is critical</a> and second, for increasing the amount of knowledge that can be extracted from any given data set. </p>
+<p>I published it as a <a href="https://ml4physicalsciences.github.io/2021/files/NeurIPS_ML4PS_2021_74.pdf">NeurIPS Machine Learning for the Physical Sciences Workshop paper</a> with the help of some collaborators I picked up along the way. We are also working on getting the work out as a much longer paper in an astronomy/astrophysics journal so that it reaches the intended audience. Additionally, we are making it easy to use by <a href="https://github.com/klukosiute/kilonovanet">distributing it as a package</a>.</p>
+<p>If you’re looking for a fast surrogate model for the spectra of kilonovae, I recommend reading the aforementioned paper. This post is intended for a non-astrophysics audience. Here I want to share, first, the interesting science that motivated me to pick up this project, second, the one interesting machine learning detail that I came across while working on this, and third, some thoughts on working on things like this in general.</p>
+<h2>Kilonova physics</h2>
+<p>Not including the infinitely dense black holes, neutron stars are the densest objects in the universe. The <em>merger</em> of two neutron stars (or a neutron star and a black hole) is a perfect astrophysical event to study if you are interested in gravity, element formation, and cosmology. During the merger, the system emits gravitational waves, which we can detect and analyze to understand gravity. The system also ejects neutron-rich material, which undergoes a nucleosynthetic (atom-producing) process that forms the heaviest elements in the universe, like gold and platinum. After these atoms form, they decay and heat all the floating, ejected material, which emits photons for about 2 weeks after the merger. These photons, if we are lucky, we can see in our telescopes, and we call the temporary glow a kilonova. Looking at kilonovae can help us understand not just neutron stars themselves, but also the source of the heavy elements, fundamental principles of gravitation, and through a clever trick of combining a distance measurement from the gravitational waves and a redshift measurement from the kilonova, we can even measure the expansion rate of the universe, the Hubble constant.</p>
+<p>Neutron star mergers are a powerful astrophysical laboratory, and we can collect insights to answer many disparate open astrophysical questions by studying them. As in almost every other scientific field, kilonova astrophysics also builds models and tries to infer the parameters of the models from data. The models that we can use for the inverse problem assume that there are 2-3 distinct types of stuff that are ripped off the neutron stars during the merger and that it is spherically symmetric. All this "stuff" is emitting photons from the surface, and we can compute how much energy is being produced at which wavelengths over time as the kilonova dims. Here is a cross-section through the center of the kilonova "sphere" that shows all the parameters of the model (based on <a href="https://science.sciencemag.org/content/370/6523/1450">Dietrich et al. 2020</a>):</p>
+<p><img src="/images/ball_figure.png" style="max-width: 400px; display: block; margin: 0 auto" alt="ball_figure.png"></p>
+<p>The input parameters of this model are the masses of purple material and the mass of the red material and blue material combined, plus the parameter $\varphi$ which controls the relative ratio of red to blue material, and $\theta_{obs}$, the angle at which we see the kilonova. The output is a time series of 500-dimensional spectra (or more, depending on the simulations). Here is a quick summary of the process.
+<img src="/images/simulator_figure.png" alt="simulator_figure.png"></p>
+<p>Simulating this time series of spectra takes hours to days for a single set of parameters. This timescale makes our usual way of solving the aforementioned inverse problem, Bayesian inference via some sort of sampling method, basically impossible since sampling just means producing a lot of spectra, for a lot of parameter sets. To circumvent the issue, people create a surrogate model using the outputs of the physics simulations; this surrogate is then purely data-driven but still gives spectra and does it much faster than "hours to days" (e.g. a few milliseconds). The most common method in my field to build surrogates is Gaussian process regression. </p>
+<p>I was curious if I could use some sort of neural network-based technique and maybe it would be faster. If the surrogate evaluation is faster, the Bayesian inference is faster. Bayesian inference in this field is the primary method of knowledge acquisition, meaning a faster surrogate enables more knowledge. </p>
+<p>So, I created a surrogate model in the form of a conditional variational autoencoder to learn a mapping from the input parameters to the output spectra. I won't give the details of the math behind VAEs because it's already been said many times many ways, and I do not think I have anything new here to add (see <a href="https://arxiv.org/abs/1906.02691">here</a> for a good resource).</p>
+<h2>The one interesting detail: variance shrinkage of Gaussian VAEs</h2>
+<p>To train a VAE, one has to choose an appropriate likelihood function for the generated and real spectra. For real-valued multi-dimensional data, one seemingly good choice would be a multidimensional Gaussian. Given some random sample $\mathbf{z}$, a mean $\mathbf{\mu}_{\theta}$ and variance $\mathbf{\sigma}^2_{\theta}$ for a Gaussian distribution predicted by neural networks, the negative log-likelihood for an example spectrum centered at mean $\mathbf{y}$ is</p>
+<p>$$
+\log p_{\theta}(\mathbf{y | \mathbf{z}}) = \sum_{i=1}^{D} -\frac{1}{2\sigma_{\theta, i}^2(z)} || y_i - \mu_{\theta, i}(z) ||^2 - \frac{1}{2} \log (2 \pi \sigma_{\theta, i}^2(z))
+$$</p>
+<p>However, if the model can learn the parameters $\theta$ such that $\mu_{theta}(z)$ provides a good reconstruction of $y$, then the $\log (\sigma_{\theta, i}^2(z))$ term will push the variance to zero before the $\frac{1}{\sigma_{\theta, i}^2(z)}$ can catch up. So, you can't actually learn a proper Gaussian likelihood, and people don't usually try. This is why in most VAE implementations, a mean square error loss is used, setting $\sigma = 1$ globally, or better yet, a binary cross-entropy error is used even when the target variables are not binary. This is because, in practice, optimizing the BCE loss is easier than optimizing the MSE loss in practice and all it requires is scaling your dataset to the range $[0,1]$ (and giving up any hopes of interpreting the output as a probability distribution). </p>
+<p>No one ever talks about this because a) the usual examples are on the MNIST dataset and so BCE is always used (<a href="http://ruishu.io/2018/03/19/bernoulli-vae/">relevant sidenote</a> on using BCE for continuous inputs) and b) this is just one of those little secrets that end up discussed <a href="http://arxiv.org/abs/1906.03260">in a paper eventually</a>. </p>
+<p>The cVAE works pretty well as a surrogate model for these spectra, but the consequence of variance shrinkage is that I need to rely on basic error verification techniques because I cannot learn the distribution. In our paper, we present some error metrics that are meaningful for astronomers i.e. errors on the data structures that astronomers actually observe. We also perform inference using the cVAE surrogate model for the singular kilonova we have ever observed and find that the cVAE surrogate is super fast and the parameters are good. I'm skipping details because you can go find them in the papers.</p>
+<h2>I trained a neural network and now it's a paper</h2>
+<p>So at the end of the day, I trained a cVAE to do a thing it was meant to do, on a slightly messy dataset that required some domain knowledge to wrangle. To me, this doesn’t sound impressive or interesting (but I have also been working on this on and off for ages so maybe I’m just done with the topic). </p>
+<p>Regardless of whether it's impressive or interesting, it's useful and it's <em>fast</em>. It hopefully enables us to do more scientific analyses of kilonovae or maybe even be clever and incorporate Bayesian fitting into gravitational wave follow-up campaigns. Since I have spent time being curious about machine learning while doing my astrophysics degrees, I can now see solutions with techniques that my colleagues have never heard of. I like to think that I've proposed a good option for a small domain-specific problem while maintaining humility about the scope and limitations of our work(e.g. the errors discussed in our papers). </p>
+<p>My collaborators and I are making the machine learning aspects of the work accessible to astrophysicists unfamiliar with machine learning, and we hope to advertise in the right places so that people actually use it. As for myself, I hope to move on to problems that are both interesting to me and useful to others. </p>
+<p>A big thank you to my collaborators Brian Nord, Zoheyr Doctor, Geert Raaijmakers, and Marcelle Soares-Santos who have contributed to this project along the way in various ways.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Obviously, your mileage may vary. This number refers to how much faster (on my laptop that is ~4 years old) is an evaluation of my surrogate model for a single input parameter set at a single time (&lt; 1ms) with the evaluation of a Gaussian process surrogate model for a single input parameter set at a single time (~400ms). Training is not included in this, but training isn't the process of Bayesian inference either. The surrogates are always trained beforehand and stored.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        </article>
+
+        <footer>
+            <p><a href="/posts/">← All posts</a></p>
+        </footer>
+    </div>
+
+    <!-- Initialize KaTeX auto-render -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>

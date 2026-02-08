@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maybe don't give language models standardized tests - Kamilė Lukošiūtė</title>
+    <meta name="description" content="On misleading evals">
+
+    <!-- Open Graph / Social Cards -->
+    <meta property="og:title" content="Maybe don't give language models standardized tests">
+    <meta property="og:description" content="On misleading evals">
+    <meta property="og:image" content="/images/evals_card.png">
+    <meta property="og:type" content="article">
+
+    <!-- KaTeX for LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #222;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2em;
+            padding-bottom: 1em;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header a {
+            color: #222;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 0.67em 0 0.3em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin: 0.83em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            margin: 1em 0;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        p {
+            margin-bottom: 0.75em;
+        }
+
+        a {
+            color: #0000EE;
+            text-decoration: underline;
+        }
+
+        a:visited {
+            color: #551A8B;
+        }
+
+        a:hover {
+            color: #0000EE;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            background: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 1em 0;
+            border-radius: 5px;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.5em auto;
+        }
+
+        blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+            color: #555;
+        }
+
+        ul, ol {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.4;
+            color: #555;
+            margin-bottom: 0.2em;
+        }
+
+        .date {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-bottom: 1em;
+        }
+
+        footer {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* LaTeX math blocks */
+        .katex-display {
+            margin: 1.5em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        /* Footnotes styling */
+        .footnote {
+            font-size: 0.9em;
+        }
+
+        .footnotes {
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        sup {
+            line-height: 0;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/">← kamilelukosiute.com</a>
+        </header>
+
+        <article>
+            <h1>Maybe don't give language models standardized tests</h1>
+
+            <p class="date">Feb 27, 2024</p>
+            <p><img src="/images/Pasted image 20240227145157.png" alt="Pasted image 20240227145157.png">
+<em>Figure 1: Dragons in the evals <a href="https://en.wikipedia.org/wiki/Psalter_world_map">waters</a></em></p>
+<p>After training a language model, it would be nice to say something about how good it is. The standard machine learning performance metric is loss, but this value is neither human-interpretable nor comparable across models. The solution offered by natural language processing researchers to this problem is to build <a href="https://arxiv.org/pdf/2009.03300v3.pdf">benchmark datasets</a>. Even if the benchmark is carefully constructed, a model's performance on the benchmark dataset will be difficult to compare to human performance. For example, if your benchmark tests knowledge in 57 subject areas, do we really expect any individual human to do well on this task?</p>
+<p>I imagine this dilemma is the motivation for evaluating language models on standardized tests. These tests are designed to measure the intelligence of humans, taken by a large number of people, and scored in a consistent way. If it were possible to administer the <em>same</em> test to a language model, model intelligence could be directly compared against a population of humans. Some LLM labs have published model evaluations of this kind and compared performance to humans, e.g. <a href="https://openai.com/research/gpt-4#capabilities">OpenAI</a> and <a href="https://twitter.com/AnthropicAI/status/1678759122194530304/photo/">Anthropic</a>. </p>
+<p>As a general rule: every time you think you've found a new good evaluation method, you haven't. There's always some detail you haven't considered.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></p>
+<p>I personally want to discuss why it's nearly impossible to fairly compare LLM performance on standardized tests to human performance. To be clear, this is not yet a particularly popular evaluation method, but I find it a particularly misleading one. Think of this post as a metaphorical "here be dragons" sign. </p>
+<p>By way of example, let's discuss how one would evaluate GPT-4 on the Math portion of a recent SAT test.</p>
+<h2>The SAT Test</h2>
+<p>Most questions on the SAT are straightforward to transcribe into a format that LMs can understand: 
+<img src="/images/Screenshot_2024-02-19_at_09.32.40-removebg-preview.png" style="max-width: 400px; display: block; margin: 0 auto" alt="Screenshot_2024-02-19_at_09.32.40-removebg-preview.png"></p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>$\sqrt(m^2) = $\sqrt(64^2)
+What is the positive solution to the given equation?
+A. 4
+B. 8
+C. 16
+D. 64
+</code></pre></div>
+
+<p>But some questions are not so straightforward:
+<img src="/images/Screenshot_2024-02-19_at_09.33.08-removebg-preview.png" style="display: block; margin: 0 auto" alt="Screenshot_2024-02-19_at_09.33.08-removebg-preview.png">
+About 30% of Math questions on the October 2023 SAT have a plot or graphic of some kind.</p>
+<h2>Evaluating vision-enabled models</h2>
+<p>If you have a vision-enabled model, the solution is simple. you pass either the whole question as an image or just the images plus question text to your model. In the GPT-4 technical report, OpenAI describe using this methodology to evaluate their vision models.</p>
+<p>I chose to give images of the whole question to the vision model, as sometimes the answer choices themselves were images. Using this method, GPT-4 has an accuracy of <strong>0.690</strong>.</p>
+<p>I have relatively few qualms with this particular evaluation method because "waking up and answering a series of seemingly random math questions" somewhat accurately describes the experience of taking the SAT as a high-schooler. As more and more models are published multi-modal by default, perhaps this will be the way to fairly administer standardized tests.</p>
+<p>One small inconsistency between this method and the way that students are evaluated is that the SAT does not measure a student's eyesight. The College Board does not penalise a student for having poor eyesight and offers a <a href="https://accommodations.collegeboard.org/how-accommodations-work/for-each-test/sat">large-print accommodation is offered</a>, but we know that <a href="https://platform.openai.com/docs/guides/vision/limitations">GPT-4 struggles</a> with reading small text and accurate spatial localisation. What would be the equivalent large-print accommodation for GPT-4?</p>
+<p>Representing images to vision models is simple; how should we represent graphs and image to language-<em>only</em> models such that the final results are comparable? </p>
+<h2>Evaluating language-only models</h2>
+<h3>1. Ignore the image.</h3>
+<p>Obviously bad. The questions with plots are meaningless without them - that's up to 30% of problems. This would make your results inherently incomparable.</p>
+<p>In the appendix of the <a href="https://arxiv.org/abs/2303.08774">GPT-4 technical report</a>, OpenAI write about doing essentially this:</p>
+<blockquote>
+<p>When evaluating text models on multiple-choice questions, we included a text tag stating IMAGE: with a non-meaningful filename wherever an image would be missing. This allows us to lower-bound the text-based models’ performance on multiple-choice exams.</p>
+</blockquote>
+<p>Using this method, GPT-4 has an accuracy of <strong>0.672</strong> on my run.</p>
+<p>My estimate for the accuracy using this method would be, in essence, ~0.9 (given the experiment below) for the non-image questions plus 4 questions (1 out of 4 chances of picking the answer randomly times 16 image questions), which is something like (0.9*(58-16)+4)/58 which is about 0.72. Similar enough. </p>
+<h3>2. Remove all questions containing images.</h3>
+<p>This is slightly better since you're not giving meaningless questions to the model, but you can't compare the model's performance on a subset. </p>
+<p>Using this method, GPT-4 has an accuracy of <strong>0.881</strong>.</p>
+<h3>3. Attach ASCII art.</h3>
+<p><img src="/images/Pasted_image_20240216145846-removebg-preview.png" style="max-width: 300px" alt="Pasted_image_20240216145846-removebg-preview.png">
+Lol I guess you could do this. Technically the model <em>could</em> do this task by counting newline characters and locating the line, but no training data really prepares a model for such a task, and is this really the capability you aim to evaluate? </p>
+<p>I didn't run this; too much work for this level of silliness.</p>
+<h3>4. Attach code for the plot.</h3>
+<p>We could provide code for the image as generated by some sort of plotting/graphics library. This is the least-worst method for a language-only model I know about, since the model <em>was</em> trained to understand code. </p>
+<p>The <a href="https://github.com/hendrycks/math">MATH dataset</a> formats all diagrams as <a href="https://asymptote.sourceforge.io/">Asymptote Vector Graphics Language</a> (asy) code. This a relatively simple tool that's used with LaTex, and since the equations in the question are typically formatted as LaTex, this is all consistent. Nevertheless, choosing to represent graphics in <code>asy</code> means that you will not just be testing your model's performance on your standardized test but <em>also</em> implicitly testing it's ability to understand <code>asy</code>. This will introduce some inconsistency between the human test and model test, and this is unfortunately true of whatever language you choose to represent your graphics in. A serious researcher would definitely set a baseline on the ability of the model to understand the graphics language.<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> The Hendrycks MATH dataset is pretty popular, and GPT-4 was finetuned on a portion of the MATH questions, so <code>asy</code> seems like a not-terrible choice. </p>
+<p>In order to convert each individual graphic to <code>asy</code> for the model, you'll have to 
+choose how to represent the question to the model because there's not one way to write code for a given graphic. The representation, of course, will impact how the model solves the problem. </p>
+<p>In the question I showed before, you need to represent the datapoints and the "line of best fit." Representing the data points is somewhat unambiguous given that it's a scatterplot in 2D space, but there are (at least) two ways to represent the line. You could write a function that plots the correct line</p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #19177C">real</span> <span style="color: #19177C">slope</span> <span style="color: #666666">=</span> <span style="color: #666666">1</span><span style="color: #408080; font-style: italic">;</span>
+<span style="color: #19177C">real</span> <span style="color: #19177C">intercept</span> <span style="color: #666666">=</span> <span style="color: #666666">2</span><span style="color: #408080; font-style: italic">;</span>
+<span style="color: #19177C">real</span> <span style="color: #19177C">f(real</span> <span style="color: #19177C">x)</span> { <span style="color: #008000; font-weight: bold">return</span> <span style="color: #19177C">slope</span><span style="color: #666666">*</span><span style="color: #19177C">x</span> <span style="color: #666666">+</span> <span style="color: #19177C">intercept</span><span style="color: #408080; font-style: italic">; };</span>
+<span style="color: #19177C">draw(graph(f</span>, <span style="color: #666666">0</span>,<span style="color: #666666">5</span><span style="color: #19177C">)</span>, <span style="color: #19177C">graphPen)</span><span style="color: #408080; font-style: italic">;</span>
+</code></pre></div>
+
+<p>or you could draw a line between two points on the line and not reveal the equation of the line. </p>
+<div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>draw((0, 2)--(4,6));
+</code></pre></div>
+
+<p>The original question was about determining the equation of the line of best fit, so the first method would be revealing way more information to the model than the second. </p>
+<p>As you convert the graphics to code, you could be revealing the answer to your model with these questions. The simulated test now seems less and less valid. Even if you're very careful and reveal as little information as possible, a model seeing code for a graph is not comparable to a human looking at an image. </p>
+<p>Using this method, GPT-4 has an accuracy of <strong>0.845.</strong></p>
+<h2>Dragons</h2>
+<p>Given that the waters are riddled with problems and dragons, maybe the solution is to evaluate language-only models on text-only datasets. The versions of these tests that are simulated for language-only models are too dissimilar to be directly comparable to human performance. </p>
+<p>Should you really want to evaluate a model on the non-image portions of a standardized test, state clearly that the comparison isn't entirely fair. This is the approach taken by the <a href="https://arxiv.org/pdf/2305.09617.pdf">MedPaLM authors</a> - emphasis mine:</p>
+<blockquote>
+<p>Large language models (LLMs) have catalyzed significant progress in medical question answering; Med-PaLM was the first model to exceed a <strong>“passing”</strong> score in US Medical Licensing Examination (USMLE) <strong>style</strong> questions with a score of 67.2% on the MedQA dataset.</p>
+</blockquote>
+<p>In summary, beware the dragons in the evals waters. Choose datasets where comparison is actually possible, and don't be misleading. </p>
+<hr />
+<p>All evals were performed using the "natural use case" method of evaluation. Give the model the question and allow it to sample as many tokens as you would like, and use another model (here, GPT-3) to compare the reference with the sampled answer and judge correctness. </p>
+<p>Dataset and scripts can be found <a href="https://github.com/klukosiute/sat-evals">on github</a>.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:2">
+<p>Anthropic's policy team have written an <a href="https://www.anthropic.com/news/evaluating-ai-systems">excellent blog post about this</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>I like to think of myself as a serious researcher, but my time is limited, so I did a fake lil eval and evaluated GPT-4's ability to comprehend <code>asy</code> by picking 15 examples from the <a href="https://asymptote.sourceforge.io/gallery/index.html">Asymptote gallery</a> and asked the model to tell me what's in the picture. It had one major hallucination and 7 minor hallucinations. The hallucinations were all about the details of how <code>asy</code> is rendered, e.g. that <code>asy</code> does color addition as light and not as pigment. Besides the one major hallucination, GPT-4 can describe the "general" shape of every image that I picked, including the ones that are just "shapes". A .txt file with quick results is included on github. I thought about, you know, making a real benchmark, but this just not a good use of one's time in the age of GPT-4-V and Gemini 1.5.&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        </article>
+
+        <footer>
+            <p><a href="/posts/">← All posts</a></p>
+        </footer>
+    </div>
+
+    <!-- Initialize KaTeX auto-render -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>
